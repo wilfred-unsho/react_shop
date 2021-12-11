@@ -79,6 +79,16 @@
       "city": "Magboro",
       "country": "United Kingdom",
       "id": 4
+    },
+    {
+      "city": "Magboro",
+      "country": "China",
+      "id": 5
+    },
+    {
+      "city": "Magboro",
+      "country": "India",
+      "id": 6
     }
   ]
 }

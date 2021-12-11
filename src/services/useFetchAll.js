@@ -1,27 +1,42 @@
-import { useState, useEffect } from "react";
+import {useState, useEffect, useRef} from "react";
 
 export default function useFetchAll(urls) {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+    const prevUrls = useRef([])
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const promises = urls.map((url) =>
-      fetch(process.env.REACT_APP_API_BASE_URL + url).then((response) => {
-        if (response.ok) return response.json();
-        throw response;
-      })
-    );
+    useEffect(() => {
+        // Only run if the array of URLS passed in changes
+        if(areEqual(prevUrls.current, urls)) {
+            setLoading(false)
+            return
+        }
+        prevUrls.current = urls;
 
-    Promise.all(promises)
-      .then((json) => setData(json))
-      .catch((e) => {
-        console.error(e);
-        setError(e);
-      })
-      .finally(() => setLoading(false));
-    // eslint-disable-next-line
-  }, []);
+        const promises = urls.map((url) =>
+            fetch(process.env.REACT_APP_API_BASE_URL + url).then((response) => {
+                if (response.ok) return response.json();
+                throw response;
+            })
+        );
 
-  return { data, loading, error };
+        Promise.all(promises)
+            .then((json) => setData(json))
+            .catch((e) => {
+                console.error(e);
+                setError(e);
+            })
+            .finally(() => setLoading(false));
+        // eslint-disable-next-line
+    }, [urls]);
+
+    return {data, loading, error};
+}
+
+function areEqual(array1, array2) {
+    return (
+        array1.length === array2.length &&
+        array1.every((value, index) => value === array2[index])
+    )
 }
